@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 #from django.template import loader
-
-from .models import Note, Tag
+from django.core.urlresolvers import reverse
+from .models import Note, Tag, parse_note_updates
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 def index(request, note_list = None):
 	#should this kind of selection logic be somewhere else?
@@ -24,9 +24,29 @@ def detail(request, note_id):
 	except Note.DoesNotExist:
 		raise Http404('Note does not exist')
 	#can also use shortcut get_object_or_404() [import from django.shortcuts]
-	return render(request, 'catalog/detail.html', {'note': note})
+	return render(request, 'catalog/detail.html', {'note': note,
+													'tags': [tag for tag in note.tags.all()]
+													})
 
 def tags(request, tag_name):
 	#tag = get_object_or_404(Tag, pk = tag_id)
 	note_list = Note.objects.filter(tags__tag_name = tag_name)
 	return index(request, note_list)
+
+def edit(request, note_id):
+	note = get_object_or_404(Note, pk=note_id)
+	new_tags, new_text = parse_note_updates(request.POST['new_text'])
+	new_tags = set(new_tags)
+	old_tags = set([t.tag_name for t in note.tags.all()])
+
+	rm_tags = old_tags - new_tags
+	add_tags = new_tags - old_tags 
+	
+	for tag in rm_tags:
+		note.remove_tag(tag)
+	for tag in add_tags:
+		note.add_tag(tag)
+		
+	note.note_text = new_text
+	note.save()
+	return HttpResponseRedirect(reverse('catalog:index'))
