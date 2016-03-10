@@ -64,9 +64,9 @@
       {% endfor %}
   {% endif %}</p>
 
-  <form role="form" action="{% if note %}{% url 'catalog:edit' note.id %}{% endif %}{HERE!}" method = "post">
+  <form role="form" action="{% if note %}{% url 'catalog:edit' note.id %}{% else %}{% url 'catalog:create' %}{% endif %}" method = "post">
   {% csrf_token %}
-    <div class="form-group">
+  <div class="form-group">
       <label for="note">Note Input:</label>
       <textarea class="form-control" rows="10" id="new_text" name="new_text">
       {% if tags %}{% for tag in tags %}#{{ tag }} {% endfor %}{% endif %}
