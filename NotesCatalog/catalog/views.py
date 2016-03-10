@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from .models import Note, Tag, parse_note_updates
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils import timezone
 
 def index(request, note_list = None):
 	#should this kind of selection logic be somewhere else?
@@ -18,7 +19,7 @@ def index(request, note_list = None):
 #	template = loader.get_template('catalog/index.html')
 #	return HttpResponse(template.render(context, request))
 
-def detail(request, note_id):
+def detail(request, note_id = None):
 	try:
 		note = Note.objects.get(pk=note_id)
 	except Note.DoesNotExist:
@@ -33,8 +34,12 @@ def tags(request, tag_name):
 	note_list = Note.objects.filter(tags__tag_name = tag_name)
 	return index(request, note_list)
 
-def edit(request, note_id):
-	note = get_object_or_404(Note, pk=note_id)
+def edit(request, note_id = None):
+	if note_id == None:
+		note = Note(pub_date=timezone.now())
+		note.save()
+	else:
+		note = get_object_or_404(Note, pk=note_id)
 	new_tags, new_text = parse_note_updates(request.POST['new_text'])
 	new_tags = set(new_tags)
 	old_tags = set([t.tag_name for t in note.tags.all()])

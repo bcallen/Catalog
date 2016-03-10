@@ -57,23 +57,23 @@
   </div>
 </nav>
   
-<h1>Edit note:</h1>
+<h1>Enter note:</h1>
 <p>{% if tags %}
       {% for tag in tags %}
         | <a href="{% url 'catalog:tags' tag_name=tag.tag_name %}">{{ tag }}</a>
       {% endfor %}
   {% endif %}</p>
 
-  <form role="form" action="{% url 'catalog:edit' note.id %}" method = "post">
+  <form role="form" action="{% if note %}{% url 'catalog:edit' note.id %}{% endif %}{HERE!}" method = "post">
   {% csrf_token %}
     <div class="form-group">
-      <label for="note">Edit Note:</label>
+      <label for="note">Note Input:</label>
       <textarea class="form-control" rows="10" id="new_text" name="new_text">
       {% if tags %}{% for tag in tags %}#{{ tag }} {% endfor %}{% endif %}
-      {{note.note_text}}
+      {% if note %}{{note.note_text}}{% endif %}
       </textarea>
   </div>
-  <button type="submit" class="btn btn-default" value="Edit">Submit Edits</button>
+  <button type="submit" class="btn btn-default" value="Edit">Submit Note</button>
 </form>
 
 </body>

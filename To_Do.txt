@@ -1,0 +1,6 @@
+to do:
+1. "add note" functionality
+2. standalone writer app
+3. write tests
+4. launch initial version
+5. add tree structures, titles, etc.
