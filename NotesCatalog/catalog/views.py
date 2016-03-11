@@ -20,14 +20,20 @@ def index(request, note_list = None):
 #	return HttpResponse(template.render(context, request))
 
 def detail(request, note_id = None):
-	try:
-		note = Note.objects.get(pk=note_id)
-	except Note.DoesNotExist:
-		raise Http404('Note does not exist')
+	if note_id is not None:
+		try:
+			note = Note.objects.get(pk=note_id)
+
+		except Note.DoesNotExist:
+			raise Http404('Note does not exist')
+		context = {'note': note,
+			'tags': [tag for tag in note.tags.all()]
+			}
+	else:
+		context = {'note': None,
+					'tags': None}
 	#can also use shortcut get_object_or_404() [import from django.shortcuts]
-	return render(request, 'catalog/detail.html', {'note': note,
-													'tags': [tag for tag in note.tags.all()]
-													})
+	return render(request, 'catalog/detail.html', context)
 
 def tags(request, tag_name):
 	#tag = get_object_or_404(Tag, pk = tag_id)
@@ -54,4 +60,11 @@ def edit(request, note_id = None):
 		
 	note.note_text = new_text
 	note.save()
+	return HttpResponseRedirect(reverse('catalog:index'))
+
+def delete(request, note_id):
+	note = get_object_or_404(Note, pk=note_id)
+	for tag in note.tags.all():
+		note.remove_tag(tag)
+	note.delete()
 	return HttpResponseRedirect(reverse('catalog:index'))
