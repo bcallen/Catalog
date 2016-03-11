@@ -41,12 +41,13 @@ def tags(request, tag_name):
 	return index(request, note_list)
 
 def edit(request, note_id = None):
+	#To do - move update logic into models
 	if note_id == None:
 		note = Note(pub_date=timezone.now())
 		note.save()
 	else:
 		note = get_object_or_404(Note, pk=note_id)
-	new_tags, new_text = parse_note_updates(request.POST['new_text'])
+	new_title, new_tags, new_text = parse_note_updates(request.POST['new_text'])
 	new_tags = set(new_tags)
 	old_tags = set([t.tag_name for t in note.tags.all()])
 
@@ -57,7 +58,8 @@ def edit(request, note_id = None):
 		note.remove_tag(tag)
 	for tag in add_tags:
 		note.add_tag(tag)
-		
+	
+	note.title = new_title
 	note.note_text = new_text
 	note.save()
 	return HttpResponseRedirect(reverse('catalog:index'))

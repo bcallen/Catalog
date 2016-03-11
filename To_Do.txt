@@ -1,5 +1,7 @@
 to do:
-1. "add note" functionality
+1. "add note" functionality.  
+2. "Delete note" functionality.
+3. front end improvements
 2. standalone writer app
 3. write tests
 4. launch initial version

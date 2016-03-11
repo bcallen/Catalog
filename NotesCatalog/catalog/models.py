@@ -13,6 +13,7 @@ class Tag(models.Model):
 		return self.__str__ == other.__str__
 
 class Note(models.Model):
+	title = models.CharField(max_length=20,default="Note_Title")
 	tags = models.ManyToManyField(Tag)
 	note_text = models.CharField(max_length=2000)
 	pub_date = models.DateTimeField('date published')
@@ -38,8 +39,22 @@ class Note(models.Model):
 		self.save()
 
 def parse_note_updates(update_text):
+	title_re = re.compile(r'\*([a-zA-Z_]+)')
 	tag_re = re.compile(r'#([a-zA-Z_]+)')
-	new_tags = [tag for tag in tag_re.findall(update_text)]
+	
+	ttl = title_re.search(update_text)
+	if ttl is None:
+		new_title = "New_Note"
+	else:
+		new_title = ttl.groups(1)[0]
+
+	tgs = tag_re.search(update_text)
+	if tgs is None:
+		new_tags = []
+	else:
+		new_tags = [tag for tag in tag_re.findall(update_text)]
+	update_text = title_re.sub('', update_text)
 	update_text = tag_re.sub('', update_text)
+	
 	update_text = re.sub(r'(^[\n\t\s]+|[\n\t\s]+$)','',update_text)
-	return new_tags, update_text
+	return new_title, new_tags, update_text

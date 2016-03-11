@@ -68,8 +68,8 @@
         
     <div class = "container panel panel-default">
       <div class="row panel-heading">
-        <div class="col-md-8">
-          <a data-toggle="collapse" href="#collapse{{forloop.counter}}">Note Title</a>
+        <div class="col-md-6">
+          <a data-toggle="collapse" href="#collapse{{forloop.counter}}">{{note.title}}</a>
           <small>
             {% if tags %}
                 {% for tag in tags %}
@@ -78,10 +78,11 @@
             {% endif %}
           </small>
         </div>
-        <div class="col-md-2">
-          <a class="pull-right" href="{% url 'catalog:detail' note_id=note.id %}"> Edit Note</a>
+        <div class="col-md-4 text-muted">
+           {{note.pub_date}}
         </div>
         <div class="col-md-2">
+          <a class="pull-left" href="{% url 'catalog:detail' note_id=note.id %}"> Edit Note</a>
           <a class="pull-right" href="{% url 'catalog:delete' note_id=note.id %}"> Delete Note</a>
         </div>
       </div>
